@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="product_discounted_price" inherit_id="website_sale.products_item" active="True"
+              name="Product Discounted Price">
+
+        <!-- Replace the product price block with discounted price display logic -->
+        <xpath expr="//div[@class='product_price']" position="replace">
+            <div class="product_price" itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer">
+                <t t-if="'base_price' in template_price_vals and (template_price_vals['base_price'] &gt; template_price_vals['price_reduce']) and (template_price_vals['price_reduce'] or not website.prevent_zero_price_sale)">
+                    <del t-attf-class="text-muted me-1 h6 mb-0" style="white-space: nowrap;">
+                        <em class="small" t-esc="template_price_vals['base_price']"
+                            t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                    </del>
+                </t>
+
+                <!-- If there's a price reduction, display original price as strikethrough -->
+                <t t-if="template_price_vals['price_reduce'] or not website.prevent_zero_price_sale">
+                    <span class="h6 mb-0"
+                          t-if="template_price_vals['price_reduce'] == template_price_vals['discounted_price']"
+                          t-esc="template_price_vals['price_reduce']"
+                          t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                    <span class="h6 mb-0"
+                          t-if="template_price_vals['price_reduce'] != template_price_vals['discounted_price']"
+                          t-esc="template_price_vals['price_reduce']"
+                          t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"
+                          style="text-decoration: line-through;"/>
+                    <span class="h6 mb-0"
+                          t-if="template_price_vals['price_reduce'] != template_price_vals['discounted_price']"
+                          t-esc="template_price_vals['discounted_price']"
+                          t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                </t>
+
+                <t t-else="">
+                    <span class="h6 mb-0" t-field="website.prevent_zero_price_sale_text"/>
+                </t>
+
+                <span itemprop="price" style="display:none;" t-esc="template_price_vals['price_reduce']"/>
+                <span itemprop="priceCurrency" style="display:none;" t-esc="website.currency_id.name"/>
+
+            </div>
+        </xpath>
+    </template>
+</odoo>
